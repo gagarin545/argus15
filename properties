@@ -1,0 +1,11 @@
+PORT=35135
+START=6
+UserFile=users
+CodCity=City
+STOP=21
+INTERVAL=7
+INTERVAL_L=44
+FIREFOX=/usr/bin/geckodriver
+LOGIN=ch_schetinkin-am
+PASSWORD=awa64Zor!
+MC=#slcts-slct_acc-dsp_f-tree-0-txt_n

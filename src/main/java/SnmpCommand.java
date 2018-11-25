@@ -11,24 +11,37 @@ abstract class SnmpCommand
 {
     private Snmp snmp = null;
     private String address;
-    private String val;
+
     private ResponseEvent event;
 
     SnmpCommand(String address) {
         this.address = address;
     }
 
-    String getAsString(OID oid, String val) throws IOException {
-        this.val = val;
-        String s;
-        if(val.length() > 0)
-            event = snmpset(new OID(oid));
+    String getAsString(OID oid, Integer val) throws IOException {
+
+        if(val > 0)
+            event = snmpsetStr(new OID(oid), val);
         else
             event = snmpget(new OID(oid));
-        try {
-            s = event.getResponse().get(0).getVariable().toString();
-        } catch (NullPointerException e) { System.out.println(e); return "";  }
-            return s;
+        if(event.getResponse() == null) return "";
+
+
+        return event.getResponse().get(0).getVariable().toString();
+    }
+
+    String getAsString(OID oid, String val) throws IOException {
+
+        if(val.length() > 0)
+            event = snmpsetStr(new OID(oid), val);
+        else
+            event = snmpget(new OID(oid));
+
+        if(event.getResponse() == null) return "";
+
+        System.out.println("event -> " + oid.toString() + "=" + event.getResponse().get(0).getVariable().toString());
+
+        return event.getResponse().get(0).getVariable().toString();
     }
 
     private ResponseEvent snmpget(OID oid) throws IOException {
@@ -44,12 +57,27 @@ abstract class SnmpCommand
         throw new RuntimeException("GET timed out");
     }
 
-    private ResponseEvent snmpset(OID oid) throws IOException {
+    private ResponseEvent snmpsetStr(OID oid, String val) throws IOException {
 
         ResponseEvent event;
         PDU pdu = new PDU();
 
         pdu.add(new VariableBinding(oid, new OctetString(val)));
+      //  pdu.add(new VariableBinding(oid, new Integer32(val1)));
+
+        pdu.setType(PDU.SET);
+        event = snmp.set(pdu, target(address, "private"));
+
+        if(event != null)
+            return event;
+        throw new RuntimeException("SET timed out");
+    }
+    private ResponseEvent snmpsetStr(OID oid, Integer val) throws IOException {
+
+        ResponseEvent event;
+        PDU pdu = new PDU();
+
+        pdu.add(new VariableBinding(oid, new Integer32(val)));
 
         pdu.setType(PDU.SET);
         event = snmp.set(pdu, target(address, "private"));

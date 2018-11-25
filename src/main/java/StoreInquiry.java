@@ -13,7 +13,7 @@ class StoreInquiry extends Inquiry {
     static ArrayList<String[]> list;
     static boolean Start = false;
     static Map Users, Citys;
-    private ScheduledExecutorService executor_inqury = Executors.newScheduledThreadPool(4);
+    private ScheduledExecutorService executor_inqury = Executors.newScheduledThreadPool(6);
     private StampedLock lock = new StampedLock();
     private  int interval_read = config.INTERVAL;
 
@@ -62,6 +62,7 @@ class StoreInquiry extends Inquiry {
                 Start = calendar_read.func(config.START, config.STOP);
                 System.out.println("Состояние=" + Start + " Пауза=" + interval_read);
                 TimeUnit.MINUTES.sleep( interval_read);
+                System.out.println("Init=" + fut_init.isDone() + " line=" + fut_line.isDone() + " Shpd=" + fut_spd.isDone() + " Send=" + fut_send.isDone());
             }
             Start = shutdriver();
             System.out.println("Stop!");

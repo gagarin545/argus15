@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import static java.lang.System.out;
@@ -62,9 +61,11 @@ abstract class Inquiry {
         int i, next;
         InquiryShpd testsh;
        // System.out.println("|" + s);
-        try {
-            i = s.indexOf("et\" target=");
-            while (i > 0) {
+
+
+        i = s.indexOf("et\" target=");
+        while (i > 0) {
+            try {
                 next = s.indexOf("target=", i + 11);
 
                 test<InquiryShpd, String> inShpd = InquiryShpd::new;
@@ -73,34 +74,40 @@ abstract class Inquiry {
                 else
                     testsh = Store.MyClasFactory(inShpd, s.substring(i, next), "");
                 i += testsh.compare(num_shpd);
-            }
-        }catch (StringIndexOutOfBoundsException | InterruptedException SIO) {
-            System.out.println("Жопа->" + SIO);
+
+                }catch (StringIndexOutOfBoundsException | InterruptedException SIO) {
+                    System.out.println("Жопа-->" + SIO + " " + i);
+                    i = s.indexOf("et\" target=", i + 10);
+                }
         }
         System.out.println("нарядов ШДП  " + StoreInquiry.list.size() );
     }
 
+
     void prepareLine(String s)  {
         int i, next;
         InquiryLine testLine;
+        i = s.indexOf("et\" target=");
 
+        while (i > 0) {
         try {
-            i = s.indexOf("et\" target=");
 
-            while (i > 0) {
-                next = s.indexOf("target=", i + 11);
+            next = s.indexOf("target=", i + 11);
                 test<InquiryLine, String> inLine = InquiryLine::new;
                 if ( next == -1)
                     testLine = Store.MyClasFactory(inLine, s.substring(i), "");
                 else
                     testLine = Store.MyClasFactory(inLine, s.substring(i, next), "");
                 i += testLine.compare(num_line);
-            }
+
         } catch (StringIndexOutOfBoundsException SIO) {
-            System.out.println("Жопа-->" + SIO);
+            System.out.println("Жопа-->" + SIO + " " + i);
+            i = s.indexOf("et\" target=", i + 10);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+            }
+
         System.out.println("нарядов на линию " + StoreInquiry.list.size()  );
     }
 
@@ -280,6 +287,7 @@ abstract class Inquiry {
 
         client.sendmessage("&^");
         client.sendmessage(String.valueOf(Calendar.getInstance().getTime()) + "<br />");
+
 
         for( Map.Entry<String, String> codSity: City.entrySet() ) {
             send = "<font color=\"BLUE\">" + codSity.getValue() + "</font><br />";
